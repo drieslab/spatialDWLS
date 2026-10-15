@@ -9,7 +9,7 @@ result is a composition: the proportions of a solved spot sum to one."></head><b
 
     <a class="navbar-brand me-2" href="../index.html">spatialDWLS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,8 +78,10 @@ by cell type (columns), on the reverse-logged scale, e.g. from
 
 <dt id="arg-clusters">clusters<a class="anchor" aria-label="anchor" href="#arg-clusters"></a></dt>
 <dd><p>cluster of every spot. Either named by spot ID (matched
-against <code>colnames(expr)</code>) or unnamed in the column order of <code>expr</code>.
-Spots are grouped by cluster to pick candidate cell types in round 1.</p></dd>
+against <code>colnames(expr)</code>; extra entries, such as the clusters of a whole
+dataset when <code>expr</code> is a subset, are ignored) or unnamed in the column
+order of <code>expr</code>. Spots are grouped by cluster to pick candidate cell types
+in round 1. Every spot needs a non-<code>NA</code> cluster.</p></dd>
 
 
 <dt id="arg-n-cell">n_cell<a class="anchor" aria-label="anchor" href="#arg-n-cell"></a></dt>

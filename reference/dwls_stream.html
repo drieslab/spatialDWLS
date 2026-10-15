@@ -17,7 +17,7 @@ window is held at a time (apart from the cell types x spots result)."></head><bo
 
     <a class="navbar-brand me-2" href="../index.html">spatialDWLS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,7 +82,8 @@ window is held at a time (apart from the cell types x spots result).</p>
 <dd><p><code>function(i, features)</code> returning the log-scaled
 expression of window <code>i</code> (1..<code>n_windows</code>) for exactly <code>features</code>, in that
 order, as a features x spots <code>matrix</code> or <code>Matrix</code> with spot IDs as column
-names. It must return the same spots for the same <code>i</code> on every pass.</p></dd>
+names. It must return the same spots for the same <code>i</code> on every pass,
+in any order.</p></dd>
 
 
 <dt id="arg-n-windows">n_windows<a class="anchor" aria-label="anchor" href="#arg-n-windows"></a></dt>
@@ -95,7 +96,8 @@ is restricted to these.</p></dd>
 
 
 <dt id="arg-clusters">clusters<a class="anchor" aria-label="anchor" href="#arg-clusters"></a></dt>
-<dd><p>cluster of every spot, named by spot ID.</p></dd>
+<dd><p>cluster of every spot, named by spot ID. Extra entries are
+ignored.</p></dd>
 
 
 <dt id="arg-sign-matrix">sign_matrix<a class="anchor" aria-label="anchor" href="#arg-sign-matrix"></a></dt>

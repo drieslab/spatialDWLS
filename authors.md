@@ -19,12 +19,12 @@ Source:
 
 Dries R, Dong R, Yuan G (2026). *spatialDWLS: Cell Type Deconvolution of
 Spatial Transcriptomics with Dampened Weighted Least Squares*. R package
-version 0.1.0, <https://drieslab.github.io/spatialDWLS/>.
+version 0.1.1, <https://drieslab.github.io/spatialDWLS/>.
 
     @Manual{,
       title = {spatialDWLS: Cell Type Deconvolution of Spatial Transcriptomics with Dampened Weighted Least Squares},
       author = {Ruben Dries and Rui Dong and Guo-Cheng Yuan},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 0.1.1},
       url = {https://drieslab.github.io/spatialDWLS/},
     }

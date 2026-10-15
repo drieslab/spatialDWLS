@@ -37,8 +37,10 @@ dwls(
 - clusters:
 
   cluster of every spot. Either named by spot ID (matched against
-  `colnames(expr)`) or unnamed in the column order of `expr`. Spots are
-  grouped by cluster to pick candidate cell types in round 1.
+  `colnames(expr)`; extra entries, such as the clusters of a whole
+  dataset when `expr` is a subset, are ignored) or unnamed in the column
+  order of `expr`. Spots are grouped by cluster to pick candidate cell
+  types in round 1. Every spot needs a non-`NA` cluster.
 
 - n_cell:
 

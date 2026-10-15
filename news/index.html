@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">spatialDWLS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,22 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.1" id="spatialdwls-011">spatialDWLS 0.1.1<a class="anchor" aria-label="anchor" href="#spatialdwls-011"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-1">bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-1"></a></h3>
+<ul><li>A cluster label with no spots in the expression no longer stops the run with “quadratic program could not be solved”. Named <code>clusters</code> may now be a superset, e.g. the clusters of a whole dataset when <code>expr</code> is a subset.</li>
+<li>In a cluster with a single candidate cell type, a spot with no signal on the signature features is now <code>NA</code>, as it is in every other cluster; it was returned as proportion 1 of that type.</li>
+<li>
+<code><a href="../reference/dwls_stream.html">dwls_stream()</a></code> matches the second round’s spots to the first round’s by name, so a <code>read_window()</code> that returns a window’s spots in a different order on a later pass no longer gives silently wrong results.</li>
+<li>Duplicated or missing cell type names, feature names or spot IDs are now an error; a duplicated cell type silently overwrote another’s proportions. <code>NA</code> clusters get an error that says so.</li>
+<li>Parallel runs no longer send every task’s expression slice to each worker.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-0-1-1">changes<a class="anchor" aria-label="anchor" href="#changes-0-1-1"></a></h3>
+<ul><li>Noted for 0.1.0: the PAGE step that picks candidate cell types reverse-logs with <code>logbase</code>. Giotto &lt;= 4.3.1 used base 2 there whatever <code>logbase</code> was, so results differ from it slightly for <code>logbase</code> other than 2 (identical at the default).</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="spatialdwls-010">spatialDWLS 0.1.0<a class="anchor" aria-label="anchor" href="#spatialdwls-010"></a></h2>
 <p>First release as a standalone package. The algorithm was previously <code>runDWLSDeconv()</code> inside Giotto (&lt;= 4.3.1), which now calls this package.</p>
 <p>Results match Giotto 4.3.1 to floating point (~1e-15), except where these bugs were fixed:</p>
@@ -58,7 +74,8 @@
 <li>
 <code><a href="../reference/dwls_signature.html">dwls_signature()</a></code>, the matrix form of Giotto’s <code>makeSignMatrixDWLSfromMatrix()</code>.</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

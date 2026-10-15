@@ -35,7 +35,8 @@ dwls_stream(
   `function(i, features)` returning the log-scaled expression of window
   `i` (1..`n_windows`) for exactly `features`, in that order, as a
   features x spots `matrix` or `Matrix` with spot IDs as column names.
-  It must return the same spots for the same `i` on every pass.
+  It must return the same spots for the same `i` on every pass, in any
+  order.
 
 - n_windows:
 
@@ -48,7 +49,7 @@ dwls_stream(
 
 - clusters:
 
-  cluster of every spot, named by spot ID.
+  cluster of every spot, named by spot ID. Extra entries are ignored.
 
 - sign_matrix:
 
