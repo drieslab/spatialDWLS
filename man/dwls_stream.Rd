@@ -22,14 +22,16 @@ dwls_stream(
 \item{read_window}{\verb{function(i, features)} returning the log-scaled
 expression of window \code{i} (1..\code{n_windows}) for exactly \code{features}, in that
 order, as a features x spots \code{matrix} or \code{Matrix} with spot IDs as column
-names. It must return the same spots for the same \code{i} on every pass.}
+names. It must return the same spots for the same \code{i} on every pass,
+in any order.}
 
 \item{n_windows}{integer. number of windows.}
 
 \item{feat_ids}{character. every feature the backend holds; the signature
 is restricted to these.}
 
-\item{clusters}{cluster of every spot, named by spot ID.}
+\item{clusters}{cluster of every spot, named by spot ID. Extra entries are
+ignored.}
 
 \item{sign_matrix}{mean expression per cell type: signature features (rows)
 by cell type (columns), on the reverse-logged scale, e.g. from

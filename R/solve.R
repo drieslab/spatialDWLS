@@ -10,9 +10,10 @@
     out <- matrix(0, length(cell_types), ncol(nolog_expr),
         dimnames = list(cell_types, colnames(nolog_expr)))
 
-    # Each task carries its own slice of the expression, so a parallel worker
-    # is sent the features and spots it solves and not the whole matrix. The
-    # slice is densified once per cluster, then cut into tasks.
+    # Each task carries its own slice of the expression, densified once per
+    # cluster and then cut into tasks. The worker function is a package-level
+    # function with its inputs passed explicitly: a closure here would carry
+    # this whole frame, every task's slice included, to each parallel worker.
     tasks <- .dwls_tasks(clusters, opts$chunk_size)
     for (cl in unique(vapply(tasks, `[[`, "", "cluster"))) {
         in_cl <- which(vapply(tasks, function(t) t$cluster == cl, TRUE))
@@ -27,15 +28,9 @@
             }
         }
     }
-    solve_task <- function(task) {
-        plan <- plans[[task$cluster]]
-        if (round == 1L) {
-            .dwls_task_round1(plan, task$B)
-        } else {
-            .dwls_task_round2(plan, task$B, task$binary, marker, cell_types)
-        }
-    }
-    res <- .dwls_lapply(tasks, solve_task, opts$BPPARAM)
+    res <- .dwls_lapply(tasks, .dwls_solve_task, opts$BPPARAM,
+        plans = plans, round = round, marker = marker,
+        cell_types = cell_types)
 
     for (i in seq_along(tasks)) {
         r <- res[[i]]
@@ -45,6 +40,15 @@
     # replaces ran `for (i in nrow)` and only ever touched the last type.
     out[] <- pmax(out, 0)
     out
+}
+
+.dwls_solve_task <- function(task, plans, round, marker, cell_types) {
+    plan <- plans[[task$cluster]]
+    if (round == 1L) {
+        .dwls_task_round1(plan, task$B)
+    } else {
+        .dwls_task_round2(plan, task$B, task$binary, marker, cell_types)
+    }
 }
 
 .dwls_task_round1 <- function(plan, B) {
@@ -66,13 +70,10 @@
         r[] <- NA_real_
         return(r)
     }
-    if (length(plan$ct) == 1L) {
-        # Only one type anywhere in the cluster: every spot is that type.
-        # This branch used to read `== 1` and left the cluster all zero.
-        r[plan$ct, ] <- 1
-        return(r)
-    }
-
+    # A cluster with a single type goes through the same loop: each of its
+    # spots is that type (Giotto <= 4.3.1 left them at 0, an `==` where an
+    # assignment was meant), unless it has no signal, which is NA as anywhere
+    # else.
     # Spots share a handful of type combinations; look each one's markers up
     # once rather than once per spot.
     genes_for <- new.env(parent = emptyenv())
@@ -121,16 +122,16 @@
 
 # Serial unless a parallel BiocParallel param is passed. BiocParallel is only
 # suggested, so it is looked up when, and only when, it is asked for.
-.dwls_lapply <- function(X, FUN, BPPARAM = NULL) {
+.dwls_lapply <- function(X, FUN, BPPARAM = NULL, ...) {
     if (is.null(BPPARAM) || methods::is(BPPARAM, "SerialParam") ||
         length(X) < 2L) {
-        return(lapply(X, FUN))
+        return(lapply(X, FUN, ...))
     }
     if (!requireNamespace("BiocParallel", quietly = TRUE)) {
         stop("[dwls] `BPPARAM` needs the BiocParallel package.",
             call. = FALSE)
     }
-    BiocParallel::bplapply(X, FUN, BPPARAM = BPPARAM)
+    BiocParallel::bplapply(X, FUN, ..., BPPARAM = BPPARAM)
 }
 
 

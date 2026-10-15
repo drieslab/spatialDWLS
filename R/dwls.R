@@ -49,8 +49,10 @@
 #'   by cell type (columns), on the reverse-logged scale, e.g. from
 #'   [dwls_signature()]. Not a binary marker matrix.
 #' @param clusters cluster of every spot. Either named by spot ID (matched
-#'   against `colnames(expr)`) or unnamed in the column order of `expr`.
-#'   Spots are grouped by cluster to pick candidate cell types in round 1.
+#'   against `colnames(expr)`; extra entries, such as the clusters of a whole
+#'   dataset when `expr` is a subset, are ignored) or unnamed in the column
+#'   order of `expr`. Spots are grouped by cluster to pick candidate cell types
+#'   in round 1. Every spot needs a non-`NA` cluster.
 #' @param n_cell numeric. expected number of cells per spot. In round 2 a cell
 #'   type is kept for a spot only when its round-1 proportion is at least
 #'   `1 / n_cell`.
@@ -87,6 +89,10 @@ dwls <- function(expr, sign_matrix, clusters, n_cell = 50, cutoff = 2,
     if (is.null(spots)) {
         stop("[dwls] `expr` needs spot IDs as column names.", call. = FALSE)
     }
+    if (anyDuplicated(spots)) {
+        stop("[dwls] `expr` has duplicated spot IDs (column names), e.g. ",
+            spots[anyDuplicated(spots)], ".", call. = FALSE)
+    }
     if (is.null(names(clusters))) {
         if (length(clusters) != length(spots)) {
             stop("[dwls] unnamed `clusters` must have one value per ",
@@ -122,11 +128,13 @@ dwls <- function(expr, sign_matrix, clusters, n_cell = 50, cutoff = 2,
 #' @param read_window `function(i, features)` returning the log-scaled
 #'   expression of window `i` (1..`n_windows`) for exactly `features`, in that
 #'   order, as a features x spots `matrix` or `Matrix` with spot IDs as column
-#'   names. It must return the same spots for the same `i` on every pass.
+#'   names. It must return the same spots for the same `i` on every pass,
+#'   in any order.
 #' @param n_windows integer. number of windows.
 #' @param feat_ids character. every feature the backend holds; the signature
 #'   is restricted to these.
-#' @param clusters cluster of every spot, named by spot ID.
+#' @param clusters cluster of every spot, named by spot ID. Extra entries are
+#'   ignored.
 #' @inheritParams dwls
 #' @returns a numeric matrix, cell types (rows) by spots (columns), spots in
 #'   window order.
@@ -171,13 +179,17 @@ dwls_stream <- function(read_window, n_windows, feat_ids, clusters,
     opts <- list(chunk_size = as.integer(chunk_size), BPPARAM = BPPARAM)
 
     sig <- as.matrix(sign_matrix)
+    .dwls_check_names(colnames(sig), "cell type (column) names of `sign_matrix`")
+    .dwls_check_names(rownames(sig), "feature (row) names of `sign_matrix`")
     genes <- intersect(rownames(sig), feat_ids)
     if (length(genes) == 0L) {
         stop("[dwls] no features shared between `sign_matrix` and the ",
             "expression values.", call. = FALSE)
     }
     sig <- sig[genes, , drop = FALSE]
-    levels <- sort(unique(as.character(clusters)))
+    # Clusters of spots that are never read are dropped after pass 1, so a
+    # superset of labels (e.g. the full metadata of a subset) is fine.
+    levels <- sort(unique(as.character(clusters[!is.na(clusters)])))
 
     # Features are restricted *before* the reverse-log transform, which then
     # touches only the non-zeros of a sparse window.
@@ -188,10 +200,16 @@ dwls_stream <- function(read_window, n_windows, feat_ids, clusters,
             stop("[dwls] `read_window` must return the requested features, ",
                 "in order.", call. = FALSE)
         }
-        cl <- clusters[colnames(L)]
-        if (anyNA(cl)) {
-            stop("[dwls] `clusters` has no entry for ", sum(is.na(cl)),
+        idx <- match(colnames(L), names(clusters))
+        if (anyNA(idx)) {
+            stop("[dwls] `clusters` has no entry for ", sum(is.na(idx)),
                 " spot(s) of the expression values.", call. = FALSE)
+        }
+        cl <- clusters[idx]
+        if (anyNA(cl)) {
+            stop("[dwls] `clusters` is NA for ", sum(is.na(cl)),
+                " spot(s) of the expression values; every spot needs a ",
+                "cluster.", call. = FALSE)
         }
         list(log = L, nolog = .dwls_unlog(L, logbase),
             clusters = as.character(cl))
@@ -213,7 +231,9 @@ dwls_stream <- function(read_window, n_windows, feat_ids, clusters,
         g_sum <- g_sum + Matrix::rowSums(w$nolog)
         n_spots <- n_spots + ncol(w$log)
     }
-    cluster_mean <- sweep(k_sum, 2L, k_n, "/")
+    keep <- k_n > 0
+    levels <- levels[keep]
+    cluster_mean <- sweep(k_sum[, keep, drop = FALSE], 2L, k_n[keep], "/")
     # PAGE's per-feature reference level: the mean on the reverse-logged
     # scale, logged back
     gene_mean <- log(g_sum / n_spots + 1, base = logbase)
@@ -252,6 +272,15 @@ dwls_stream <- function(read_window, n_windows, feat_ids, clusters,
     out <- vector("list", n_windows)
     for (i in seq_len(n_windows)) {
         w <- get_window(i)
+        # pass 3's per-spot types are matched to this pass's spots by name: a
+        # reader may return a window's spots in another order the second time
+        if (!identical(colnames(w$log), colnames(binary[[i]]))) {
+            if (!setequal(colnames(w$log), colnames(binary[[i]]))) {
+                stop("[dwls] `read_window(", i, ", )` returned different ",
+                    "spots on different passes.", call. = FALSE)
+            }
+            binary[[i]] <- binary[[i]][, colnames(w$log), drop = FALSE]
+        }
         out[[i]] <- .dwls_solve_round(w$nolog, w$clusters, plans2,
             cell_types = colnames(sig), round = 2L, binary = binary[[i]],
             marker = marker2, opts = opts)
@@ -301,6 +330,20 @@ dwls_signature <- function(expr, sign_gene, cell_type) {
     out
 }
 
+
+# Names that index results must exist and be unique: a duplicated cell type
+# would silently overwrite another type's proportions.
+.dwls_check_names <- function(x, what) {
+    if (is.null(x) || anyNA(x) || any(!nzchar(x))) {
+        stop("[dwls] the ", what, " are missing.", call. = FALSE)
+    }
+    if (anyDuplicated(x)) {
+        stop("[dwls] the ", what, " must be unique; duplicated: ",
+            paste(unique(x[duplicated(x)]), collapse = ", "), ".",
+            call. = FALSE)
+    }
+    invisible(x)
+}
 
 # logbase^x - 1, keeping a sparse matrix sparse (0 maps to 0).
 .dwls_unlog <- function(x, logbase) {

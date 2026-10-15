@@ -120,3 +120,56 @@ test_that("arguments are validated", {
     rownames(sig) <- paste0("other", seq_len(nrow(sig)))
     expect_error(dwls(d$expr, sig, d$clusters), "no features shared")
 })
+
+
+test_that("extra cluster labels are ignored (spots that are not in expr)", {
+    d <- .synthetic()
+    full <- dwls(d$expr, d$sig, d$clusters, n_cell = 5)
+
+    # a label with no spots at all
+    ghost <- dwls(d$expr, d$sig, c(d$clusters, extra = "ghost"), n_cell = 5)
+    expect_equal(ghost, full)
+
+    # a subset of spots with the full cluster vector: one cluster drops out
+    mixed <- names(d$clusters)[d$clusters == "mixed"]
+    sub <- dwls(d$expr[, mixed], d$sig, d$clusters, n_cell = 5)
+    expect_identical(colnames(sub), mixed)
+    expect_false(anyNA(sub))
+    expect_equal(unname(colSums(sub)), rep(1, length(mixed)),
+        tolerance = 1e-8)
+})
+
+
+test_that("a no-signal spot in a single-type cluster is NA, not 1", {
+    d <- .synthetic()
+    d$expr[, "s3"] <- 0   # s3 is in the pure-C cluster
+    prop <- dwls(d$expr, d$sig, d$clusters, n_cell = 5)
+    expect_true(all(is.na(prop[, "s3"])))
+    # the rest of that cluster is still C
+    pure <- setdiff(names(d$clusters)[d$clusters == "pure"], "s3")
+    expect_equal(unname(prop["C", pure]), rep(1, length(pure)))
+})
+
+
+test_that("names that index the result are validated", {
+    d <- .synthetic()
+    sig <- d$sig
+    colnames(sig) <- c("A", "B", "A")
+    expect_error(dwls(d$expr, sig, d$clusters), "must be unique.*A")
+
+    sig <- d$sig
+    rownames(sig)[2] <- rownames(sig)[1]
+    expect_error(dwls(d$expr, sig, d$clusters), "feature .* must be unique")
+
+    sig <- d$sig
+    colnames(sig) <- NULL
+    expect_error(dwls(d$expr, sig, d$clusters), "cell type .* missing")
+
+    x <- d$expr
+    colnames(x)[2] <- colnames(x)[1]
+    expect_error(dwls(x, d$sig, d$clusters), "duplicated spot IDs")
+
+    cl <- d$clusters
+    cl[5] <- NA
+    expect_error(dwls(d$expr, d$sig, cl), "is NA for 1 spot")
+})

@@ -1,6 +1,6 @@
 Package: spatialDWLS
 Title: Cell Type Deconvolution of Spatial Transcriptomics with Dampened Weighted Least Squares
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Ruben", "Dries", email = "rubendries@gmail.com",
         role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7650-7754")),

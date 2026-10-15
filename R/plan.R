@@ -113,10 +113,17 @@
     BPPARAM = NULL) {
     plans <- .dwls_lapply(colnames(present), function(cl) {
         ct <- rownames(present)[present[, cl]]
-        if (length(ct) <= 1L) {
+        if (length(ct) == 0L) {
             return(list(ct = ct, genes = character(), S = NULL, J = NA))
         }
         genes <- .dwls_marker_genes(marker2, ct, rownames(sig))
+        if (length(ct) == 1L) {
+            # Nothing to solve: a spot with signal is this type. The features
+            # are read only to tell a spot with signal from one without, so a
+            # type that marks no feature falls back to the whole signature.
+            if (length(genes) == 0L) genes <- rownames(sig)
+            return(list(ct = ct, genes = genes, S = NULL, J = NA))
+        }
         S <- sig[genes, ct, drop = FALSE]
         list(ct = ct, genes = genes, S = S,
             J = .dwls_cluster_constant(S, cluster_mean[genes, cl]))

@@ -26,8 +26,10 @@ by cell type (columns), on the reverse-logged scale, e.g. from
 \code{\link[=dwls_signature]{dwls_signature()}}. Not a binary marker matrix.}
 
 \item{clusters}{cluster of every spot. Either named by spot ID (matched
-against \code{colnames(expr)}) or unnamed in the column order of \code{expr}.
-Spots are grouped by cluster to pick candidate cell types in round 1.}
+against \code{colnames(expr)}; extra entries, such as the clusters of a whole
+dataset when \code{expr} is a subset, are ignored) or unnamed in the column
+order of \code{expr}. Spots are grouped by cluster to pick candidate cell types
+in round 1. Every spot needs a non-\code{NA} cluster.}
 
 \item{n_cell}{numeric. expected number of cells per spot. In round 2 a cell
 type is kept for a spot only when its round-1 proportion is at least
