@@ -1,0 +1,6 @@
+              cell_ID type_1 type_2 type_3 type_4 type_5    type_6    type_7
+               <char>  <num>  <num>  <num>  <num>  <num>     <num>     <num>
+1: AAAGGGATGTAGCAAG-1      0      0      0      0      0 0.5209807 0.4790193
+2: AAATGGCATGTCTTGT-1      1      0      0      0      0 0.0000000 0.0000000
+3: AAATGGTCAATGTGCC-1      0      0      1      0      0 0.0000000 0.0000000
+4: AAATTAACGGGTAGCT-1      0      0      1      0      0 0.0000000 0.0000000

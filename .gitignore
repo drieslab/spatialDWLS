@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+*.Rcheck/
+spatialDWLS_*.tar.gz
+dev/*.rds
+docs/
+inst/doc

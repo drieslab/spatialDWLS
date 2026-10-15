@@ -1,0 +1,30 @@
+url: https://drieslab.github.io/spatialDWLS/
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left: [intro, articles, reference, news]
+    right: [search, github]
+
+articles:
+  - title: "Examples"
+    navbar: ~
+    contents:
+      - spatialDWLS
+      - articles/giotto
+
+reference:
+  - title: Deconvolution
+    desc: Estimate cell type proportions per spot.
+    contents:
+      - dwls
+      - dwls_stream
+  - title: Reference profiles
+    desc: Build the signature matrix from single-cell data.
+    contents:
+      - dwls_signature
+  - title: Package
+    contents:
+      - spatialDWLS-package

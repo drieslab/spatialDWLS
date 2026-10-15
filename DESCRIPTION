@@ -1,0 +1,42 @@
+Package: spatialDWLS
+Title: Cell Type Deconvolution of Spatial Transcriptomics with Dampened Weighted Least Squares
+Version: 0.1.0
+Authors@R: c(
+    person("Ruben", "Dries", email = "rubendries@gmail.com",
+        role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7650-7754")),
+    person("Rui", "Dong", role = "aut",
+        comment = "original spatialDWLS implementation"),
+    person("Guo-Cheng", "Yuan", email = "guo-cheng.yuan@mssm.edu",
+        role = "aut"),
+    person("Jiaji", "George Chen", email = "jiajic@bu.edu", role = "ctb")
+    )
+Description: Estimates the cell type composition of each spot of a spatial
+    transcriptomics experiment from a single-cell reference, following
+    spatialDWLS (Dong and Yuan 2021, <doi:10.1186/s13059-021-02362-7>), which
+    builds on dampened weighted least squares (DWLS; Tsoucas et al. 2019,
+    <doi:10.1038/s41467-019-10802-z>). Spots are solved in two rounds:
+    candidate cell types are chosen per cluster by enrichment, then each spot
+    is re-solved against the types present in it. Works on dense or sparse
+    matrices, in parallel through 'BiocParallel', and over windows of spots
+    for expression stores that do not fit in memory.
+License: MIT + file LICENSE
+Encoding: UTF-8
+URL: https://drieslab.github.io/spatialDWLS/, https://github.com/drieslab/spatialDWLS
+BugReports: https://github.com/drieslab/spatialDWLS/issues
+Depends:
+    R (>= 4.1.0)
+Imports:
+    Matrix,
+    MatrixGenerics,
+    methods,
+    quadprog,
+    stats
+Suggests:
+    BiocParallel,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Roxygen: list(markdown = TRUE)
+Config/roxygen2/version: 8.1.1
