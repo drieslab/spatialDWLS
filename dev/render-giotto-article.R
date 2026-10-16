@@ -1,17 +1,18 @@
 # Precompute the outputs shown in vignettes/articles/giotto.Rmd.
 #
-# CI cannot run that article: it needs Giotto with the spatialDWLS wrapper,
-# GiottoData and Giotto's environment. This script runs the article's code
-# locally and saves what the article displays: printed tables as .txt and
-# figures as .png, under vignettes/articles/figures/.
+# CI does not run that article: it needs Giotto (>= 4.3.2), GiottoVisuals
+# (>= 0.2.16, for spatDeconvPlot() with numeric cell type names), GiottoData
+# and Giotto's environment. This script runs the article's code locally and
+# saves what the article displays: printed tables as .txt and figures as
+# .png, under vignettes/articles/figures/. Re-run it, and commit the outputs,
+# when the Giotto side of the workflow changes.
 #
 #   Rscript dev/render-giotto-article.R
 #
-# Environment variables (optional):
+# Environment variables (optional), to render against unreleased code:
 #   GIOTTO_PATH         a Giotto checkout to pkgload::load_all() instead of the
-#                       installed Giotto (needed until the wrapper is released)
-#   GIOTTOVISUALS_PATH  likewise for GiottoVisuals (spatDeconvPlot() needs a
-#                       version that selects cell types by name)
+#                       installed Giotto
+#   GIOTTOVISUALS_PATH  likewise for GiottoVisuals
 suppressMessages(library(arrow))  # before Giotto: see GiottoDisk notes
 load_or_lib <- function(pkg, path_var) {
     path <- Sys.getenv(path_var)
