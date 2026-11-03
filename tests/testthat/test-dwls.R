@@ -173,3 +173,13 @@ test_that("names that index the result are validated", {
     cl[5] <- NA
     expect_error(dwls(d$expr, d$sig, cl), "is NA for 1 spot")
 })
+
+test_that("row names with a names attribute (as from a 10x h5 file) are accepted", {
+    s <- .synthetic()
+    named <- s$expr
+    rn <- rownames(named)
+    rownames(named) <- stats::setNames(rn, paste0("ENSG", seq_along(rn)))
+    expect_false(is.null(names(rownames(named))))
+    expect_equal(dwls(named, s$sig, s$clusters, n_cell = 5),
+        dwls(s$expr, s$sig, s$clusters, n_cell = 5))
+})

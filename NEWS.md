@@ -10,6 +10,11 @@
   the gradient with the weights held fixed. With it a model that types single
   cells can be trained from spot expression.
 
+## bug fixes
+* Feature names that carry a names attribute, as the row names of a matrix
+  read from a 10x h5 file do, no longer fail the check that the expression
+  holds the signature features in order.
+
 # spatialDWLS 0.1.1
 
 ## bug fixes

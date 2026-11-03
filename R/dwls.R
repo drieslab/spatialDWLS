@@ -196,10 +196,13 @@ dwls_stream <- function(read_window, n_windows, feat_ids, clusters,
     load_window <- function(i) {
         L <- read_window(i, genes)
         if (!methods::is(L, "Matrix")) L <- as.matrix(L)
-        if (!identical(rownames(L), genes)) {
+        # compared without attributes: a matrix read from a 10x h5 file
+        # carries the feature IDs as names on its row names
+        if (!identical(unname(rownames(L)), unname(genes))) {
             stop("[dwls] `read_window` must return the requested features, ",
                 "in order.", call. = FALSE)
         }
+        rownames(L) <- unname(genes)
         idx <- match(colnames(L), names(clusters))
         if (anyNA(idx)) {
             stop("[dwls] `clusters` has no entry for ", sum(is.na(idx)),
@@ -274,7 +277,7 @@ dwls_stream <- function(read_window, n_windows, feat_ids, clusters,
         w <- get_window(i)
         # pass 3's per-spot types are matched to this pass's spots by name: a
         # reader may return a window's spots in another order the second time
-        if (!identical(colnames(w$log), colnames(binary[[i]]))) {
+        if (!identical(unname(colnames(w$log)), unname(colnames(binary[[i]])))) {
             if (!setequal(colnames(w$log), colnames(binary[[i]]))) {
                 stop("[dwls] `read_window(", i, ", )` returned different ",
                     "spots on different passes.", call. = FALSE)
