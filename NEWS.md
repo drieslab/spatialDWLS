@@ -1,3 +1,15 @@
+# spatialDWLS 0.1.2
+
+## new features
+* `dwls_design()` returns the dampened WLS problem of each spot as data: the
+  reverse-logged expression on the signature features, the signature on those
+  features and the dampening constant `J` of each spot (cross-validated per
+  cluster, as in the first round of `dwls()`).
+* `dwls_expression_loss()` scores cell type proportions from any source
+  against the spot expression with spatialDWLS's dampened weights, and returns
+  the gradient with the weights held fixed. With it a model that types single
+  cells can be trained from spot expression.
+
 # spatialDWLS 0.1.1
 
 ## bug fixes

@@ -21,6 +21,11 @@ reference:
     contents:
       - dwls
       - dwls_stream
+  - title: Expression loss
+    desc: Score cell type proportions from any source against spot expression.
+    contents:
+      - dwls_design
+      - dwls_expression_loss
   - title: Reference profiles
     desc: Build the signature matrix from single-cell data.
     contents:

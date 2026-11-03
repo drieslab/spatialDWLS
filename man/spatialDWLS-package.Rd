@@ -39,13 +39,13 @@ Useful links:
 Authors:
 \itemize{
   \item Ruben Dries \email{rubendries@gmail.com} (\href{https://orcid.org/0000-0001-7650-7754}{ORCID})
-  \item Rui Dong (original spatialDWLS implementation)
+  \item Rui Dong (original spatialDWLS method and implementation)
   \item Guo-Cheng Yuan \email{guo-cheng.yuan@mssm.edu}
 }
 
 Other contributors:
 \itemize{
-  \item Jiaji George Chen \email{jiajic@bu.edu} [contributor]
+  \item Jiaji George Chen \email{jiajic@bu.edu} (package and website) [contributor]
 }
 
 }
